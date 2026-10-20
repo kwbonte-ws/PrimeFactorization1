@@ -29,6 +29,7 @@ These standards apply to all work in this repository.
 - Prefer collection assertions such as `actual.Should().Equal(expected)` and `actual.Should().BeEmpty()`.
 - Capture exception-producing calls in an `Action` and assert with `action.Should().Throw<TException>()`; use `ThrowExactly<TException>()` and `WithParameterName(...)` when exact type and parameter name are part of the test's intent.
 - Preserve strict Red → Green → Refactor for behavior changes. Assertion readability refactoring does not require new failing tests; run the complete suite before and after refactoring.
+- When validating meaningful new business logic, run `./scripts/coverage.ps1` after the TDD cycles. Review production line and branch coverage separately, report gaps, and keep generated reports out of Git. No minimum coverage percentage is imposed.
 
 ## C# and .NET standards
 
