@@ -150,6 +150,9 @@ _TeamCity*
 .axoCover/*
 !.axoCover/settings.json
 
+# Stryker's default reports and temporary workspaces (script output is under artifacts/).
+StrykerOutput/
+.stryker-tmp/
 # Coverlet is a free, cross platform Code Coverage Tool
 coverage*.json
 coverage*.xml

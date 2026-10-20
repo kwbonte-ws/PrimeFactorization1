@@ -30,6 +30,7 @@ These standards apply to all work in this repository.
 - Capture exception-producing calls in an `Action` and assert with `action.Should().Throw<TException>()`; use `ThrowExactly<TException>()` and `WithParameterName(...)` when exact type and parameter name are part of the test's intent.
 - Preserve strict Red → Green → Refactor for behavior changes. Assertion readability refactoring does not require new failing tests; run the complete suite before and after refactoring.
 - When validating meaningful new business logic, run `./scripts/coverage.ps1` after the TDD cycles. Review production line and branch coverage separately, report gaps, and keep generated reports out of Git. No minimum coverage percentage is imposed.
+- Mutation testing with `./scripts/mutation-test.ps1` is recommended for significant Domain or Application logic changes, after completing TDD cycles; it is not required after every small cycle. Review killed, surviving, timed-out, compile-error, uncovered, and ignored mutants separately. Do not change tests or exclude production mutations just to improve a score, and do not impose a mutation-score gate without explicit approval.
 
 ## C# and .NET standards
 

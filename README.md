@@ -88,3 +88,98 @@ A future Azure DevOps job can run the same script without `-OpenReport`, publish
 `artifacts/coverage/results/**/*.trx` as test results, publish
 `artifacts/coverage/report/Cobertura.xml` as coverage, and retain the HTML report
 directory as a build artifact. No pipeline or coverage threshold is imposed yet.
+
+## Mutation testing
+
+Stryker.NET 5.0.0 is pinned in the existing local tool manifest. It targets .NET
+10 and is [Apache-2.0 licensed](https://github.com/stryker-mutator/stryker-net/blob/master/LICENSE).
+This workflow uses only local execution and local reports: no global tool,
+dashboard upload, paid service, or production package reference is required.
+
+From the repository root, run:
+
+```powershell
+./scripts/mutation-test.ps1
+./scripts/mutation-test.ps1 -OpenReport
+```
+
+To run one layer or invoke it from a CI job:
+
+```powershell
+pwsh -NoProfile -File ./scripts/mutation-test.ps1 -Layer Domain
+pwsh -NoProfile -File ./scripts/mutation-test.ps1 -Layer Application
+```
+
+Windows PowerShell 5.1 is also supported; substitute `powershell` for `pwsh`.
+Paths resolve relative to the script, so an absolute script path works from any
+working directory. The script restores and checks the local tool, runs the
+selected layers sequentially, and replaces only their generated output folders.
+It prints each Stryker exit code, continues to collect results for the other
+selected layer, and returns the first nonzero Stryker exit code if a run fails.
+Tool availability, missing-report, and rebuild failures are also reported as
+failures. A final clean rebuild restores ordinary test outputs, including after
+Stryker encounters a temporary file lock while restoring a mutated DLL.
+
+Open the generated HTML files directly in your browser:
+
+- `artifacts/mutation/domain/reports/mutation-report.html`
+- `artifacts/mutation/application/reports/mutation-report.html`
+
+Each report also has a sibling `mutation-report.json` containing the precise
+mutant statuses and source locations. `-OpenReport` opens successful runs after
+completion. Without that switch the workflow is noninteractive. For Azure
+DevOps, retain `artifacts/mutation/` as a build artifact and use the script's exit
+code; no pipeline is configured yet.
+
+### Scope and interpretation
+
+Each layer's test project contains a `stryker-config.json` selecting its direct
+production project reference. Only Domain tests evaluate Domain mutations, and
+only Application tests evaluate Application mutations; scores are separate, not
+combined. The Console project and test source files are outside those production
+targets. Build outputs and common generated C# filenames are explicitly excluded.
+No handwritten production source or mutation operator is excluded to raise scores.
+
+The configuration selects VSTest, the `Complete` mutation level, two concurrent
+test sessions, and local HTML, JSON, and console reporters. These settings were
+checked against the installed tool's help and configuration parser.
+`--skip-version-check` and `--output` are command-line options in this version,
+not JSON configuration keys. Existing Coverlet/ReportGenerator settings are
+unchanged. Stryker's default score-break threshold is zero, so low scores do not
+fail this workflow; default report colors are informational.
+
+Ordinary coverage measures which code executes. Mutation testing deliberately
+changes compiled production code and checks whether tests notice the changes.
+High coverage alone does not demonstrate effective assertions, and a high
+mutation score is evidence for the generated mutations rather than proof of
+correctness for every possible defect.
+
+- **Killed:** tests detected the mutation by failing.
+- **Survived:** covered mutation completed without a failing test; investigate missing assertions or cases, and consider whether it is behaviorally equivalent.
+- **Timeout:** the mutated test run exceeded Stryker's time allowance; investigate loops and slow mutants separately from assertion failures.
+- **CompileError:** the mutated program could not compile; excluded from the score.
+- **NoCoverage:** no selected test executed the mutation; counted as undetected.
+- **Ignored:** Stryker excluded the mutant from evaluation; inspect its reason. The project's configuration does not disable mutation operators.
+
+Stryker's score is `(Killed + Timeout) / (Killed + Timeout + Survived + NoCoverage)`.
+Ignored and compilation-error mutants are excluded. Always inspect the counts
+alongside the percentage, especially when there are few mutants or many timeouts.
+Use the JSON statuses for exact counts; the installed version's console table
+can group ignored mutants into its surviving column.
+
+Initial analysis generated 17 Domain mutants: 10 killed, 3 timed out, and 4
+ignored by Stryker's built-in block-already-covered filter. Application generated
+one mutant, removing the `Execute` body, which its tests killed. Neither layer
+had surviving, uncovered, or compilation-error mutants. Both scores were 100%,
+with the qualification that Domain includes timeout detections and Application
+has a very small mutation surface. The timeout mutations affect the Domain's
+factor-search division, divisor increment, and factor-reduction assignment.
+They suggest reviewing termination behavior rather than inventing assertion gaps
+from nonexistent survivors. No production logic or test assertions were changed.
+
+Mutation testing rebuilds projects and repeatedly runs tests, so it is slower
+than ordinary tests. Initial local runs took roughly 34 seconds for Domain and
+11 seconds for Application, plus tool restore and final rebuild time. Execution
+time varies with hardware, package caches, test suite growth, and timeout
+mutations. Use it after significant logic changes or in a dedicated CI job,
+rather than after every small Red → Green → Refactor cycle.
