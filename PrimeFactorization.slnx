@@ -6,6 +6,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PrimeFactorization.Application.Tests/PrimeFactorization.Application.Tests.csproj" />
+    <Project Path="tests/PrimeFactorization.Console.Tests/PrimeFactorization.Console.Tests.csproj" />
     <Project Path="tests/PrimeFactorization.Domain.Tests/PrimeFactorization.Domain.Tests.csproj" />
   </Folder>
 </Solution>
