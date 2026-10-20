@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PrimeFactorization.Application/PrimeFactorization.Application.csproj" />
+    <Project Path="src/PrimeFactorization.Console/PrimeFactorization.Console.csproj" />
+    <Project Path="src/PrimeFactorization.Domain/PrimeFactorization.Domain.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PrimeFactorization.Application.Tests/PrimeFactorization.Application.Tests.csproj" />
+    <Project Path="tests/PrimeFactorization.Domain.Tests/PrimeFactorization.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
