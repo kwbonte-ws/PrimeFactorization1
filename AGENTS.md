@@ -22,6 +22,14 @@ These standards apply to all work in this repository.
 - Execute tests again after refactoring.
 - Never modify a test simply to conceal incorrect production behavior.
 
+## Testing conventions
+
+- Use xUnit for test discovery and execution, and prefer AwesomeAssertions for all future test assertions.
+- Use AwesomeAssertions instead of FluentAssertions. Prefer the latest stable compatible NuGet package versions, with explicit versions recorded in project files and upgrades validated by builds and tests.
+- Prefer collection assertions such as `actual.Should().Equal(expected)` and `actual.Should().BeEmpty()`.
+- Capture exception-producing calls in an `Action` and assert with `action.Should().Throw<TException>()`; use `ThrowExactly<TException>()` and `WithParameterName(...)` when exact type and parameter name are part of the test's intent.
+- Preserve strict Red → Green → Refactor for behavior changes. Assertion readability refactoring does not require new failing tests; run the complete suite before and after refactoring.
+
 ## C# and .NET standards
 
 - Target .NET 10.

@@ -1,3 +1,4 @@
+using AwesomeAssertions;
 using PrimeFactorization.Domain;
 
 namespace PrimeFactorization.Domain.Tests;
@@ -19,7 +20,7 @@ public class PrimeFactorizerTests
 
         var factors = factorizer.Factorize(number);
 
-        Assert.Equal(expected, factors);
+        factors.Should().Equal(expected);
     }
 
     [Theory]
@@ -32,7 +33,7 @@ public class PrimeFactorizerTests
 
         var factors = factorizer.Factorize(number);
 
-        Assert.Equal(expected, factors);
+        factors.Should().Equal(expected);
     }
 
     [Fact]
@@ -42,7 +43,7 @@ public class PrimeFactorizerTests
 
         var factors = factorizer.Factorize(6);
 
-        Assert.Equal<int>([2, 3], factors);
+        factors.Should().Equal(2, 3);
     }
 
     [Theory]
@@ -55,7 +56,7 @@ public class PrimeFactorizerTests
 
         var factors = factorizer.Factorize(number);
 
-        Assert.Equal<int>([number], factors);
+        factors.Should().Equal(number);
     }
 
     [Theory]
@@ -65,7 +66,9 @@ public class PrimeFactorizerTests
     {
         var factorizer = new PrimeFactorizer();
 
-        Assert.Throws<ArgumentOutOfRangeException>("number", () => factorizer.Factorize(number));
+        Action action = () => factorizer.Factorize(number);
+
+        action.Should().ThrowExactly<ArgumentOutOfRangeException>().WithParameterName("number");
     }
 
     [Fact]
@@ -73,7 +76,9 @@ public class PrimeFactorizerTests
     {
         var factorizer = new PrimeFactorizer();
 
-        Assert.Throws<ArgumentOutOfRangeException>("number", () => factorizer.Factorize(0));
+        Action action = () => factorizer.Factorize(0);
+
+        action.Should().ThrowExactly<ArgumentOutOfRangeException>().WithParameterName("number");
     }
 
     [Fact]
@@ -83,7 +88,7 @@ public class PrimeFactorizerTests
 
         var factors = factorizer.Factorize(1);
 
-        Assert.Empty(factors);
+        factors.Should().BeEmpty();
     }
 
     [Fact]
@@ -93,6 +98,6 @@ public class PrimeFactorizerTests
 
         var factors = factorizer.Factorize(2);
 
-        Assert.Equal<int>([2], factors);
+        factors.Should().Equal(2);
     }
 }
