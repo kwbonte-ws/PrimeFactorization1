@@ -16,6 +16,63 @@ dotnet run --project src/PrimeFactorization.Console/PrimeFactorization.Console.c
 Enter positive 32-bit integers to calculate their prime factors. Enter `exit` to
 quit; redirected input also ends the session at EOF.
 
+## Static analysis and formatting
+
+The .NET 10 SDK supplies Roslyn analyzers and `dotnet format`; no additional
+analyzer packages or global tools are needed. `Directory.Build.props` enables
+the latest recommended rules (`AnalysisLevel=latest-recommended`) and code-style
+analysis during builds (`EnforceCodeStyleInBuild=true`). The recommended rule set
+tracks the installed SDK. Warnings remain errors across all six projects.
+
+The root `.editorconfig` defines four-space C# indentation, Allman braces,
+file-scoped namespaces, explicit accessibility, `var` for locals, and naming
+conventions: PascalCase types/properties/production methods, `I`-prefixed
+interfaces, camelCase parameters/locals, and `_camelCase` private fields.
+Selected style diagnostics have warning severity so builds enforce them as
+errors. Formatting verification checks whitespace as well. Keep method bodies
+readable with block syntax; modern syntax is preferred when it improves clarity.
+
+Run these checks from the repository root before completing coding assignments:
+
+```powershell
+dotnet format PrimeFactorization.slnx --verify-no-changes
+dotnet build PrimeFactorization.slnx
+dotnet test PrimeFactorization.slnx
+```
+
+To apply automatic fixes, then validate the result:
+
+```powershell
+dotnet format PrimeFactorization.slnx
+dotnet build PrimeFactorization.slnx
+dotnet test PrimeFactorization.slnx
+dotnet format PrimeFactorization.slnx --verify-no-changes
+```
+
+Review formatter changes before accepting them. Verification exits nonzero when
+fixes are needed; format verification does not replace the build, because some
+analyzer diagnostics have no automatic fix. Resolve legitimate violations
+without changing behavior or weakening tests.
+
+Two deliberate rule boundaries preserve the existing design and readability:
+
+- [CA1822](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1822)
+  recommends making stateless methods static. Converting the public
+  `PrimeFactorizer.Factorize` API would break instance callers and alter the
+  existing composition across layers. Its `api_surface` is limited to private
+  and internal members, where this recommendation still applies. Public APIs
+  remain instance-based without introducing artificial state or interfaces.
+- CA1707 disallows underscores in public names. It remains enabled for production
+  code but is disabled only under `tests/`, where existing
+  `Behavior_Scenario_Expectation` method names make test results easier to read.
+  The custom PascalCase method naming rule likewise applies only under `src/`.
+
+The initial baseline found three whitespace diagnostics in the test helper's
+`ReadCount` property, CA1822 on `Factorize`, CA1707 on 17 test methods, and CA1507
+on a parameter-name assertion. The property was expanded to multiple lines and
+the assertion now uses `nameof(number)` with the same expected value. Production
+logic, test data, and assertion strength are unchanged.
+
 ## Code coverage
 
 Run with Windows PowerShell 5.1 or PowerShell 7+ and the .NET 10 SDK:

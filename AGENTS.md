@@ -41,6 +41,8 @@ These standards apply to all work in this repository.
 - Prefer expressive naming, focused methods, and readable implementations.
 - Avoid unnecessary comments and magic numbers.
 - Follow standard .NET formatting conventions.
+- Use the SDK's built-in Roslyn analyzers and root `.editorconfig`; preserve warnings as errors.
+- Before completing coding assignments, run `dotnet format PrimeFactorization.slnx --verify-no-changes`, `dotnet build PrimeFactorization.slnx`, and `dotnet test PrimeFactorization.slnx`. Fix legitimate violations and rerun formatting verification after the final code change. Explain analyzer conflicts with readability or Clean Architecture rather than blindly suppressing them.
 
 ## Repository hygiene
 

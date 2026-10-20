@@ -68,7 +68,7 @@ public class PrimeFactorizerTests
 
         Action action = () => factorizer.Factorize(number);
 
-        action.Should().ThrowExactly<ArgumentOutOfRangeException>().WithParameterName("number");
+        action.Should().ThrowExactly<ArgumentOutOfRangeException>().WithParameterName(nameof(number));
     }
 
     [Fact]

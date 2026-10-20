@@ -131,9 +131,14 @@ public class ConsoleSessionTests
             $"Welcome to PrimeFactorization!{Environment.NewLine}" +
             "Enter a positive integer or type \"exit\": ");
     }
+
     private sealed class EndOfInputReader : TextReader
     {
-        public int ReadCount { get; private set; }
+        public int ReadCount
+        {
+            get;
+            private set;
+        }
 
         public override string? ReadLine()
         {
